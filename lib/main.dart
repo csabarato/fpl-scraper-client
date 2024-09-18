@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fpl_scraper_client/screens/home_page.dart';
 import 'package:fpl_scraper_client/screens/picks_screen.dart';
 
 void main() {
@@ -18,9 +17,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
         useMaterial3: true,
       ),
-      //home: PicksScreen(leagueId: Uri.base.queryParameters['leagueId'],)
-      home: PicksScreen(leagueId: '411201',)
-
+      home: PicksScreen(leagueId: Uri.base.queryParameters['leagueId'])
     );
   }
 }

@@ -12,6 +12,7 @@ class PlayerPickCard extends StatelessWidget {
     return SizedBox(
       height: 60.0,
       child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0)),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30.0),
           child: Row(
