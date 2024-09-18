@@ -5,8 +5,8 @@ import 'package:fpl_scraper_client/config/app_config.dart';
 
 class ParticipantService {
 
-  static Future<http.Response> fetchParticipants(String leagueId) {
-    final uri = Uri.parse('${AppConfig.fplScraperServiceUrl}/league/participants/411201');
+  static Future<http.Response> fetchLeagueData(String leagueId) {
+    final uri = Uri.parse('${AppConfig.fplScraperServiceUrl}/league/data/411201');
     return http.get(uri);
   }
 

@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fantasy PL Stats',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
+        colorScheme: ColorScheme.fromSeed(seedColor:  const Color.fromRGBO(56,4,60,1)),
         useMaterial3: true,
       ),
       home: PicksScreen(leagueId: Uri.base.queryParameters['leagueId'])

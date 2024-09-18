@@ -14,6 +14,7 @@ class PicksScreen extends StatefulWidget {
 }
 
 class _PicksScreenState extends State<PicksScreen> {
+  String? leagueName;
   late Map<String, dynamic> participantsMap;
   late List<PlayerModel> playerList = [];
   late List<PlayerModel> filteredPlayerList = [];
@@ -27,8 +28,10 @@ class _PicksScreenState extends State<PicksScreen> {
     var leagueId = widget.leagueId ?? '411201';
 
     if (leagueId != null) {
-      ParticipantService.fetchParticipants(leagueId).then((resp) {
-        participantsMap = jsonDecode(utf8.decode(resp.bodyBytes));
+      ParticipantService.fetchLeagueData(leagueId).then((resp) {
+        Map<String, dynamic> leagueDataMap = jsonDecode(utf8.decode(resp.bodyBytes));
+        leagueName = leagueDataMap["leagueName"];
+        participantsMap = leagueDataMap["participants"];
         ParticipantService.fetchPicks(4, participantsMap.keys.toList())
             .then((resp) {
           Map<String, dynamic> json = jsonDecode(utf8.decode(resp.bodyBytes));
@@ -65,8 +68,19 @@ class _PicksScreenState extends State<PicksScreen> {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Scaffold(
+        appBar: AppBar(
+          titleTextStyle: const TextStyle(color: Colors.white),
+          backgroundColor: const Color.fromRGBO(56, 4, 60, 1),
+          title: const Text('FPL Player Picks'),
+        ),
         body: Column(
           children: [
+            Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  leagueName ?? '',
+                  style: const TextStyle(fontSize: 25.0),
+                )),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
@@ -99,7 +113,7 @@ class _PicksScreenState extends State<PicksScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: ExpansionTile(
                             shape: const Border.fromBorderSide(
-                                BorderSide(color: Colors.blue, width: 2.0)),
+                                BorderSide(color: Color.fromRGBO(56,4,60,1), width: 2.0)),
                             title: Text(player.name,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold)),
