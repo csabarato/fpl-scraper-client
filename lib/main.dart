@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:fpl_scraper_client/screens/picks_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    runApp(const MyApp());
+  } catch (e) {
+    print('Firebase init failed $e');
+  }
 }
 
 class MyApp extends StatelessWidget {
