@@ -32,7 +32,7 @@ class _PicksScreenState extends State<PicksScreen> {
         Map<String, dynamic> leagueDataMap = jsonDecode(utf8.decode(resp.bodyBytes));
         leagueName = leagueDataMap["leagueName"];
         participantsMap = leagueDataMap["participants"];
-        ParticipantService.fetchPicks(4, participantsMap.keys.toList())
+        ParticipantService.fetchPicks(5, participantsMap.keys.toList())
             .then((resp) {
           Map<String, dynamic> json = jsonDecode(utf8.decode(resp.bodyBytes));
           for (Map<String, dynamic> element in json['picks']) {

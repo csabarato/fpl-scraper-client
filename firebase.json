@@ -1,0 +1,25 @@
+{
+  "flutter": {
+    "platforms": {
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "fpl-scraper-client",
+          "configurations": {
+            "web": "1:1010704612222:web:dfc9d1af43a39ee097912f"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "frameworksBackend": {
+      "region": "europe-west1"
+    }
+  }
+}
