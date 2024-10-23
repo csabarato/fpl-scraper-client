@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fpl_scraper_client/screens/picks_screen.dart';
+import 'package:fpl_scraper_client/constants/strings.dart';
+import 'package:fpl_scraper_client/screens/home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -22,12 +23,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Fantasy PL Stats',
+      title: kAppName,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor:  const Color.fromRGBO(56,4,60,1)),
         useMaterial3: true,
       ),
-      home: PicksScreen(leagueId: Uri.base.queryParameters['leagueId'])
+      home: const HomePage()
     );
   }
 }

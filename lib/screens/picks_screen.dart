@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fpl_scraper_client/components/player_pick_card.dart';
+import 'package:fpl_scraper_client/constants/strings.dart';
 import 'package:fpl_scraper_client/models/player_model.dart';
 import 'package:fpl_scraper_client/services/participant_service.dart';
 
 class PicksScreen extends StatefulWidget {
-  const PicksScreen({super.key, this.leagueId});
+  const PicksScreen({super.key, required this.leagueId});
 
-  final String? leagueId;
+  final String leagueId;
 
   @override
   State<PicksScreen> createState() => _PicksScreenState();
@@ -25,26 +26,22 @@ class _PicksScreenState extends State<PicksScreen> {
   void initState() {
     super.initState();
 
-    var leagueId = widget.leagueId ?? '411201';
-
-    if (leagueId != null) {
-      ParticipantService.fetchLeagueData(leagueId).then((resp) {
-        Map<String, dynamic> leagueDataMap = jsonDecode(utf8.decode(resp.bodyBytes));
-        leagueName = leagueDataMap["leagueName"];
-        participantsMap = leagueDataMap["participants"];
-        ParticipantService.fetchPicks(5, participantsMap.keys.toList())
-            .then((resp) {
-          Map<String, dynamic> json = jsonDecode(utf8.decode(resp.bodyBytes));
-          for (Map<String, dynamic> element in json['picks']) {
-            playerList.add(PlayerModel.fromJson(element));
-          }
-          filteredPlayerList = playerList;
-          setState(() {
-            isLoading = false;
-          });
+    ParticipantService.fetchLeagueData(widget.leagueId).then((resp) {
+      Map<String, dynamic> leagueDataMap =
+          jsonDecode(utf8.decode(resp.bodyBytes));
+      leagueName = leagueDataMap["leagueName"];
+      participantsMap = leagueDataMap["participants"];
+      ParticipantService.fetchPicks(participantsMap.keys.toList()).then((resp) {
+        Map<String, dynamic> json = jsonDecode(utf8.decode(resp.bodyBytes));
+        for (Map<String, dynamic> element in json['picks']) {
+          playerList.add(PlayerModel.fromJson(element));
+        }
+        filteredPlayerList = playerList;
+        setState(() {
+          isLoading = false;
         });
       });
-    }
+    });
   }
 
   void filterPlayers(String query) {
@@ -71,7 +68,7 @@ class _PicksScreenState extends State<PicksScreen> {
         appBar: AppBar(
           titleTextStyle: const TextStyle(color: Colors.white),
           backgroundColor: const Color.fromRGBO(56, 4, 60, 1),
-          title: const Text('FPL Player Picks'),
+          title: const Text(kAppName),
         ),
         body: Column(
           children: [
@@ -85,7 +82,7 @@ class _PicksScreenState extends State<PicksScreen> {
               padding: const EdgeInsets.all(8.0),
               child: TextField(
                 decoration: const InputDecoration(
-                  labelText: 'Search Players',
+                  labelText: kSearchPlayersHint,
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.search),
                 ),
@@ -112,8 +109,9 @@ class _PicksScreenState extends State<PicksScreen> {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: ExpansionTile(
-                            shape: const Border.fromBorderSide(
-                                BorderSide(color: Color.fromRGBO(56,4,60,1), width: 2.0)),
+                            shape: const Border.fromBorderSide(BorderSide(
+                                color: Color.fromRGBO(56, 4, 60, 1),
+                                width: 2.0)),
                             title: Text(player.name,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold)),
