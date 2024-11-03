@@ -39,29 +39,52 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: const Color.fromRGBO(56, 4, 60, 1),
           title: const Text(kAppName),
         ),
-        body: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        body: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-                  child: SizedBox(
-                    width: 500,
-                    child: TextField(
-                      controller: _controller,
-                      decoration: const InputDecoration(
-                        labelText: kLeagueIdTextInputHint,
-                        border: OutlineInputBorder(),
-                      ),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: SizedBox(
+                  width: 500,
+                  child: TextField(
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      labelText: kLeagueIdTextInputHint,
+                      border: OutlineInputBorder(),
                     ),
                   ),
+                ),
               ),
+            ),
             const SizedBox(width: 20.0),
             RoundedButton(
               onPressed: getLeagueIdAndNavigateToPicks,
               text: kContinue,
             ),
+            SizedBox(
+                height: 50,
+                child: leagueId == kNoLeagueId
+                    ? const Center(
+                        child: Text(
+                        kNoLeagueCodeFoundMessage,
+                        style: TextStyle(fontSize: 20, color: Colors.redAccent),
+                      ))
+                    : const Text('')),
+            const Text(
+              'How to find my League ID?',
+              style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            const Text(
+              '1. Go to Leagues & Cups tab on Fantasy PL site.\n'
+              '2. Select your preferred league\n'
+              '3. Copy & paste the URL from your browser.',
+              style: TextStyle(fontSize: 15.0, height: 2.5),
+            ),
           ],
-        ), // This trailing comma makes auto-formatting nicer for build methods.
+        ),
       ),
     );
   }
@@ -93,7 +116,7 @@ class _HomePageState extends State<HomePage> {
         context,
         MaterialPageRoute(
             builder: (context) => PicksScreen(
-              leagueId: leagueId!,
-            )));
+                  leagueId: leagueId!,
+                )));
   }
 }
