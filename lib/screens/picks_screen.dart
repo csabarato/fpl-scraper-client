@@ -69,6 +69,7 @@ class _PicksScreenState extends State<PicksScreen> {
           titleTextStyle: const TextStyle(color: Colors.white),
           backgroundColor: const Color.fromRGBO(56, 4, 60, 1),
           title: const Text(kAppName),
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
         body: Column(
           children: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fpl_scraper_client/components/rounded_button.dart';
 import 'package:fpl_scraper_client/constants/strings.dart';
 import 'package:fpl_scraper_client/screens/picks_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,16 +18,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    var leagueId = Uri.base.queryParameters['leagueId'];
-    if (leagueId != null && leagueId.isNotEmpty) {
-      Future.microtask(() => {
-            if (mounted)
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => PicksScreen(leagueId: leagueId)))
-          });
-    }
+    getLeagueId();
   }
 
   @override
@@ -66,7 +58,7 @@ class _HomePageState extends State<HomePage> {
                 child: leagueId == kNoLeagueId
                     ? const Center(
                         child: Text(
-                        kNoLeagueCodeFoundMessage,
+                        kNoLeagueIdFoundMessage,
                         style: TextStyle(fontSize: 20, color: Colors.redAccent),
                       ))
                     : const Text('')),
@@ -94,8 +86,9 @@ class _HomePageState extends State<HomePage> {
     String inputStr = _controller.text.trim();
 
     if (RegExp(r'^\d+$').hasMatch(inputStr)) {
-      leagueId = inputStr; // Input is directly the league code
-      navigateToPicksScreen(leagueId!);
+      leagueId = inputStr;
+      storeLeagueIdInSharedPrefs(leagueId!);
+      navigateToPicksScreen();
       return;
     }
 
@@ -103,7 +96,8 @@ class _HomePageState extends State<HomePage> {
     Match? match = regExp.firstMatch(inputStr);
     if (match != null) {
       leagueId = match.group(1);
-      navigateToPicksScreen(leagueId!);
+      storeLeagueIdInSharedPrefs(leagueId!);
+      navigateToPicksScreen();
     } else {
       setState(() {
         leagueId = kNoLeagueId;
@@ -111,7 +105,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void navigateToPicksScreen(String leagueCode) {
+  void navigateToPicksScreen() {
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -119,4 +113,45 @@ class _HomePageState extends State<HomePage> {
                   leagueId: leagueId!,
                 )));
   }
+
+  void storeLeagueIdInSharedPrefs(String leagueId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('leagueId', leagueId);
+  }
+
+  void getLeagueId() async {
+
+    String? leagueId = await getLeagueIdFromSharedPref();
+    if (leagueId.isEmpty) {
+      leagueId = getLeagueIdFromQueryParams();
+      if (leagueId != null && leagueId.isNotEmpty) {
+        storeLeagueIdInSharedPrefs(leagueId);
+      }
+    }
+
+    if (leagueId != null && leagueId.isNotEmpty) {
+      Future.microtask(() => {
+        if (mounted)
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => PicksScreen(leagueId: leagueId!)))
+      });
+    }
+  }
+
+  Future<String> getLeagueIdFromSharedPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? savedLeagueId = prefs.getString('leagueId');
+    if (savedLeagueId != null && savedLeagueId.isNotEmpty) {
+      return savedLeagueId;
+    }
+    return "";
+  }
+
+  String? getLeagueIdFromQueryParams() {
+    return Uri.base.queryParameters['leagueId'];
+  }
+
+
 }
