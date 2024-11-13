@@ -1,16 +1,28 @@
-# fpl_scraper_client
+# FPL Scraper Client - Frontend web application
 
-Client application for fpl-scraper
+Web client application of Fantasy Premier League Scraper written in Flutter.
 
-## Getting Started
+See backend application here: https://github.com/csabarato/fpl-scraper-service
 
-This project is a starting point for a Flutter application.
+## The FPL Scraper application
 
-A few resources to get you started if this is your first Flutter project:
+http://fplpicks.online/
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Fantasy PL Scraper application is a scraper bot, which creates insights, brief overviews about FPL Leagues.
+Provide your League ID, and take a look at the selected players, captains within your league!
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The content of the site always contains the latest data of your league.
+
+## Features
+
+1. Picked Players overview:
+
+- See all picked players of the league, presented in a list.
+- For each player the managers listed, who used the player.
+- Role of the actual player in the team. (Triple captain, Captain, Starting 11 or Bench)
+
+2. Search between picked players
+   
+- Search between football players by name
+
+### Follow me for more features, league insights! 
