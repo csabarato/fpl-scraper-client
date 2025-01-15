@@ -1,11 +1,10 @@
-
 import 'package:flutter/material.dart';
 
-class PlayerPickCard extends StatelessWidget {
-  const PlayerPickCard(this.managerName, this.multiplier, {super.key});
+class ManagerCaptainCard extends StatelessWidget {
+  const ManagerCaptainCard(this.managerName, this.playerName, {super.key});
 
   final String managerName;
-  final int multiplier;
+  final String playerName;
 
   @override
   Widget build(BuildContext context) {
@@ -22,22 +21,11 @@ class PlayerPickCard extends StatelessWidget {
               SizedBox(
                   width: 200.0,
                   child: Text(managerName)),
-
-              Text(getPlayerRoleText(multiplier))
+              Text(playerName)
             ],
           ),
         ),
       ),
     );
-  }
-
-  String getPlayerRoleText(int multiplier) {
-    switch (multiplier) {
-      case 0: return 'Bench';
-      case 1: return 'Starting 11';
-      case 2: return 'Captain';
-      case 3: return 'Triple captain';
-      default: return '';
-    }
   }
 }

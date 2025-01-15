@@ -1,7 +1,7 @@
 class PlayerPickModel {
 
-  final String participantId;
+  final String managerId;
   final int multiplier;
 
-  PlayerPickModel(this.participantId, this.multiplier);
+  PlayerPickModel(this.managerId, this.multiplier);
 }

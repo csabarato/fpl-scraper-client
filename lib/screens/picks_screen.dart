@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:fpl_scraper_client/components/manager_captain_card.dart';
 import 'package:fpl_scraper_client/components/player_pick_card.dart';
 import 'package:fpl_scraper_client/constants/strings.dart';
+import 'package:fpl_scraper_client/models/manager_captain_model.dart';
 import 'package:fpl_scraper_client/models/player_model.dart';
-import 'package:fpl_scraper_client/services/participant_service.dart';
+import 'package:fpl_scraper_client/services/manager_service.dart';
 
 class PicksScreen extends StatefulWidget {
   const PicksScreen({super.key, required this.leagueId});
@@ -16,7 +18,8 @@ class PicksScreen extends StatefulWidget {
 
 class _PicksScreenState extends State<PicksScreen> {
   String? leagueName;
-  late Map<String, dynamic> participantsMap;
+  late Map<String, dynamic> managersMap;
+  late List<ManagerCaptainModel> managerCaptainList = [];
   late List<PlayerModel> playerList = [];
   late List<PlayerModel> filteredPlayerList = [];
   String searchQuery = '';
@@ -26,13 +29,22 @@ class _PicksScreenState extends State<PicksScreen> {
   void initState() {
     super.initState();
 
-    ParticipantService.fetchLeagueData(widget.leagueId).then((resp) {
+    ManagerService.fetchLeagueData(widget.leagueId).then((resp) {
       Map<String, dynamic> leagueDataMap =
           jsonDecode(utf8.decode(resp.bodyBytes));
       leagueName = leagueDataMap["leagueName"];
-      participantsMap = leagueDataMap["participants"];
-      ParticipantService.fetchPicks(participantsMap.keys.toList()).then((resp) {
+      managersMap = leagueDataMap["managers"];
+
+      ManagerService.fetchPicks(managersMap.keys.toList()).then((resp) {
         Map<String, dynamic> json = jsonDecode(utf8.decode(resp.bodyBytes));
+
+        Map<String, dynamic> managerCapsMap =
+            json['captainPicks'] as Map<String, dynamic>;
+        for (MapEntry<String, dynamic> managerCapEntry
+            in managerCapsMap.entries) {
+          managerCaptainList.add(ManagerCaptainModel.fromJson(managerCapEntry));
+        }
+
         for (Map<String, dynamic> element in json['picks']) {
           playerList.add(PlayerModel.fromJson(element));
         }
@@ -73,74 +85,126 @@ class _PicksScreenState extends State<PicksScreen> {
         ),
         body: Column(
           children: [
-            Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  leagueName ?? '',
-                  style: const TextStyle(fontSize: 25.0),
-                )),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                decoration: const InputDecoration(
-                  labelText: kSearchPlayersHint,
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.search),
-                ),
-                onChanged: (value) {
-                  filterPlayers(value);
-                },
-              ),
-            ),
-            // ListView for displaying players
             Expanded(
-              child: isLoading
-                  ? const Center(
-                      child: SizedBox(
-                          height: 100.0,
-                          width: 100.0,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 8.0,
-                            strokeCap: StrokeCap.round,
-                          )))
-                  : ListView.builder(
-                      itemCount: filteredPlayerList.length,
-                      itemBuilder: (context, playerIndex) {
-                        final player = filteredPlayerList[playerIndex];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: ExpansionTile(
-                            shape: const Border.fromBorderSide(BorderSide(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        leagueName ?? '',
+                        style: const TextStyle(fontSize: 25.0),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          labelText: kSearchPlayersHint,
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.search),
+                        ),
+                        onChanged: (value) {
+                          filterPlayers(value);
+                        },
+                      ),
+                    ),
+                    // Captains List
+                    isLoading
+                        ? const SizedBox()
+                        : ExpansionTile(
+                            shape: const Border.fromBorderSide(
+                              BorderSide(
                                 color: Color.fromRGBO(56, 4, 60, 1),
-                                width: 2.0)),
-                            title: Text(player.name,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold)),
-                            textColor: Colors.black,
-                            subtitle: Text(
-                              'Picked by ${player.numOfPicks} players',
+                                width: 2.0,
+                              ),
+                            ),
+                            title: const Text(
+                              'Captains',
+                              style: TextStyle(
+                                  color: Color.fromRGBO(56, 4, 60, 1),
+                                  fontWeight: FontWeight.bold),
                             ),
                             children: [
-                              SizedBox(
-                                height: player.playerPicks.length * 60.0,
-                                child: ListView.builder(
-                                  physics:
-                                      const NeverScrollableScrollPhysics(), // Disable scrolling within this ListView
-                                  itemCount: player.playerPicks.length,
-                                  itemBuilder: (context, pickIndex) {
-                                    return PlayerPickCard(
-                                      participantsMap[player
-                                          .playerPicks[pickIndex]
-                                          .participantId],
-                                      player.playerPicks[pickIndex].multiplier,
-                                    );
-                                  },
-                                ),
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: managersMap.length,
+                                itemBuilder: (context, managerIndex) {
+                                  String managerId =
+                                      managerCaptainList[managerIndex]
+                                          .managerId
+                                          .toString();
+                                  return ManagerCaptainCard(
+                                    managersMap[managerId],
+                                    managerCaptainList[managerIndex].playerName,
+                                  );
+                                },
                               ),
                             ],
                           ),
-                        );
-                      }),
+                    // Players List
+                    isLoading
+                        ? const Center(
+                            child: SizedBox(
+                              height: 100.0,
+                              width: 100.0,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 8.0,
+                                strokeCap: StrokeCap.round,
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: filteredPlayerList.length,
+                            itemBuilder: (context, playerIndex) {
+                              final player = filteredPlayerList[playerIndex];
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: ExpansionTile(
+                                  shape: const Border.fromBorderSide(
+                                    BorderSide(
+                                      color: Color.fromRGBO(56, 4, 60, 1),
+                                      width: 2.0,
+                                    ),
+                                  ),
+                                  title: Text(
+                                    player.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  textColor: Colors.black,
+                                  subtitle: Text(
+                                    'Picked by ${player.numOfPicks} players',
+                                  ),
+                                  children: [
+                                    ListView.builder(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemCount: player.playerPicks.length,
+                                      itemBuilder: (context, pickIndex) {
+                                        return PlayerPickCard(
+                                          managersMap[player
+                                              .playerPicks[pickIndex]
+                                              .managerId],
+                                          player.playerPicks[pickIndex]
+                                              .multiplier,
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
