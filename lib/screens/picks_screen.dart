@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
 import 'package:fpl_scraper_client/components/manager_captain_card.dart';
 import 'package:fpl_scraper_client/components/player_pick_card.dart';
@@ -49,6 +50,7 @@ class _PicksScreenState extends State<PicksScreen> {
           playerList.add(PlayerModel.fromJson(element));
         }
         filteredPlayerList = playerList;
+        sortManagerNames();
         setState(() {
           isLoading = false;
         });
@@ -210,5 +212,21 @@ class _PicksScreenState extends State<PicksScreen> {
         ),
       ),
     );
+  }
+
+  void sortManagerNames() {
+    managerCaptainList.sort((a, b)  {
+        String nameA = removeDiacritics(managersMap[a.managerId.toString()]);
+        String nameB = removeDiacritics(managersMap[b.managerId.toString()]);
+        return nameA.compareTo(nameB);
+    });
+
+    for (var playerData in playerList) {
+      playerData.playerPicks.sort((a, b) {
+        String nameA = removeDiacritics(managersMap[a.managerId.toString()]);
+        String nameB = removeDiacritics(managersMap[b.managerId.toString()]);
+        return nameA.compareTo(nameB);
+      });
+    }
   }
 }
